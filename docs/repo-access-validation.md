@@ -68,20 +68,20 @@ A fallback keyword scan did not find assignment-like hardcoded secrets in these 
 
 Read access is confirmed for Hermes, Codex, and Claude.
 
-Remote write access is **not yet confirmed**.
+Remote write access is confirmed after updating the GitHub PAT permissions.
 
-A provided GitHub fine-grained PAT authenticated as the repo owner, but did not have sufficient repository contents write capability for this repository:
+Validation performed:
 
-- `git push --dry-run origin main` returned HTTP 403.
-- GitHub Git Database API `POST /git/blobs` returned `Resource not accessible by personal access token`.
+- GitHub API authenticated as the repo owner.
+- GitHub API reported repository permissions including `push: true` and `admin: true`.
+- `git push --dry-run origin main` succeeded.
+- The initial local guardrails commit was pushed to `origin/main`.
+- `git ls-remote --heads origin` confirmed remote `refs/heads/main` exists.
 
-The failed PAT was removed from the local credential store after testing and is not stored in this repository.
+Remote head after initial push:
 
-Before pushing the initial commit, configure one of:
+```text
+refs/heads/main
+```
 
-1. A fine-grained PAT selected for this repository with **Contents: Read and write** permission.
-2. A classic PAT with `repo` scope.
-3. `gh auth login` / `gh auth setup-git` using an account with write access.
-4. SSH deploy key or user SSH key with write access.
-
-Do not embed tokens in committed files or printed reports.
+The PAT is not stored in this repository and must never be committed. The local machine may use a protected Git credential helper file for future pushes.
