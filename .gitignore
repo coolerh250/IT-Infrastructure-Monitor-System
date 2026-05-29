@@ -1,0 +1,47 @@
+# Secrets and environment files
+.env
+.env.*
+!.env.example
+*.secret
+*secret*
+credentials*
+*.cred
+*.token
+*.key
+*.pem
+*.p12
+*.pfx
+*.kdbx
+id_rsa*
+id_ed25519*
+
+# Monitoring stack local/private config
+**/grafana.ini
+**/prometheus.yml.local
+**/alertmanager.yml.local
+**/provisioning/datasources/*secret*.yml
+**/provisioning/datasources/*secret*.yaml
+**/backup-encryption.key
+**/backups/
+**/restore-work/
+**/secrets/
+
+# Terraform / IaC sensitive state
+*.tfstate
+*.tfstate.*
+.terraform/
+terraform.tfvars
+*.auto.tfvars
+
+# OS/editor/runtime noise
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.vscode/
+.idea/
+__pycache__/
+*.py[cod]
+node_modules/
+dist/
+build/
