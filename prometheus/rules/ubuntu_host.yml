@@ -1,0 +1,102 @@
+groups:
+  - name: ubuntu-host-hermesai
+    rules:
+      - alert: UbuntuHostDown
+        expr: up{job="node", instance="hermesAI"} == 0
+        for: 5m
+        labels:
+          severity: high
+          target: hermesAI
+        annotations:
+          summary: "Ubuntu host exporter down"
+          description: "node_exporter on hermesAI / 10.0.1.40 has been unreachable for more than 5 minutes."
+
+      - alert: UbuntuIcmpDown
+        expr: probe_success{job="blackbox-icmp", instance="10.0.1.40"} == 0
+        for: 5m
+        labels:
+          severity: high
+          target: hermesAI
+        annotations:
+          summary: "Ubuntu host ICMP probe failed"
+          description: "ICMP probe to hermesAI / 10.0.1.40 has failed for more than 5 minutes."
+
+      - alert: UbuntuSshUnavailable
+        expr: probe_success{job="blackbox-tcp", instance="10.0.1.40:22"} == 0
+        for: 5m
+        labels:
+          severity: high
+          target: hermesAI
+        annotations:
+          summary: "Ubuntu host SSH unavailable"
+          description: "TCP connect probe to SSH on hermesAI / 10.0.1.40:22 has failed for more than 5 minutes."
+
+      - alert: UbuntuHighCpuUsage
+        expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle", instance="hermesAI"}[5m])) * 100) > 85
+        for: 15m
+        labels:
+          severity: warning
+          target: hermesAI
+        annotations:
+          summary: "Ubuntu host high CPU usage"
+          description: "hermesAI CPU usage is above 85% for 15 minutes."
+
+      - alert: UbuntuHighMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes{instance="hermesAI"} / node_memory_MemTotal_bytes{instance="hermesAI"})) * 100 > 90
+        for: 10m
+        labels:
+          severity: high
+          target: hermesAI
+        annotations:
+          summary: "Ubuntu host high memory usage"
+          description: "hermesAI memory usage is above 90% for 10 minutes."
+
+      - alert: UbuntuDiskSpaceLow
+        expr: (1 - (node_filesystem_avail_bytes{instance="hermesAI",fstype!~"tmpfs|overlay|squashfs|proc|sysfs|devtmpfs"} / node_filesystem_size_bytes{instance="hermesAI",fstype!~"tmpfs|overlay|squashfs|proc|sysfs|devtmpfs"})) * 100 > 85
+        for: 15m
+        labels:
+          severity: high
+          target: hermesAI
+        annotations:
+          summary: "Ubuntu host low disk space"
+          description: "hermesAI filesystem {{ $labels.mountpoint }} usage is above 85%."
+
+      - alert: UbuntuInodeSpaceLow
+        expr: (1 - (node_filesystem_files_free{instance="hermesAI",fstype!~"tmpfs|overlay|squashfs|proc|sysfs|devtmpfs"} / node_filesystem_files{instance="hermesAI",fstype!~"tmpfs|overlay|squashfs|proc|sysfs|devtmpfs"})) * 100 > 85
+        for: 15m
+        labels:
+          severity: high
+          target: hermesAI
+        annotations:
+          summary: "Ubuntu host low inode space"
+          description: "hermesAI filesystem {{ $labels.mountpoint }} inode usage is above 85%."
+
+      - alert: UbuntuNetworkErrors
+        expr: rate(node_network_receive_errs_total{instance="hermesAI",device!~"lo|veth.*|docker.*|br-.*"}[5m]) + rate(node_network_transmit_errs_total{instance="hermesAI",device!~"lo|veth.*|docker.*|br-.*"}[5m]) > 0
+        for: 10m
+        labels:
+          severity: warning
+          target: hermesAI
+        annotations:
+          summary: "Ubuntu host network errors"
+          description: "hermesAI network interface {{ $labels.device }} is reporting errors."
+
+      - alert: UbuntuClockSkew
+        expr: abs(node_timex_offset_seconds{instance="hermesAI"}) > 0.05
+        for: 10m
+        labels:
+          severity: warning
+          target: hermesAI
+        annotations:
+          summary: "Ubuntu host clock skew"
+          description: "hermesAI clock offset is above 50 ms."
+
+      - alert: UbuntuRebootDetected
+        expr: time() - node_boot_time_seconds{instance="hermesAI"} < 600
+        for: 1m
+        labels:
+          severity: warning
+          target: hermesAI
+        annotations:
+          summary: "Ubuntu host reboot detected"
+          description: "hermesAI appears to have rebooted within the last 10 minutes."

@@ -1,8 +1,7 @@
 - targets:
-    - 10.0.1.40:9100
+    - 10.0.1.40
   labels:
     instance: hermesAI
     site: main
     role: ubuntu-host
-    os: ubuntu
-    owner: infrastructure
+    probe: icmp

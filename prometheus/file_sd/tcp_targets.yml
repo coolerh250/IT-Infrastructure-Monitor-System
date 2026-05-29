@@ -1,8 +1,8 @@
 - targets:
-    - 10.0.1.40:9100
+    - 10.0.1.40:22
   labels:
     instance: hermesAI
+    service: ssh
     site: main
     role: ubuntu-host
-    os: ubuntu
-    owner: infrastructure
+    probe: tcp

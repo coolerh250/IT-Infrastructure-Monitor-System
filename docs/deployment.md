@@ -69,3 +69,8 @@ UFW_MANAGE=1 ./scripts/deploy.sh
 ```
 
 The script does not add deny rules. Confirm the host firewall policy blocks unwanted sources from Grafana, Prometheus, and Alertmanager.
+
+
+## First Real Ubuntu Target
+
+The first real monitored Ubuntu host is `hermesAI` at `10.0.1.40`. See `docs/ubuntu-host-monitoring.md` for host-side permissions, node_exporter installation, firewall requirements, Prometheus targets, and verification steps.

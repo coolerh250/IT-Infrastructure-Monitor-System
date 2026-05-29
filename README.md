@@ -57,3 +57,8 @@ Run the local validation helper before deployment or after edits:
 ```
 
 It performs shell syntax checks and, when Docker Compose is available, validates the Compose model.
+
+
+## First monitored host
+
+The first real monitored Ubuntu host is `hermesAI` (`10.0.1.40`). Host-side setup and monitoring scope are documented in [docs/ubuntu-host-monitoring.md](docs/ubuntu-host-monitoring.md).
