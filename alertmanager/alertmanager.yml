@@ -1,0 +1,48 @@
+global:
+  smtp_smarthost: "${SMTP_SMARTHOST}"
+  smtp_from: "${ALERT_EMAIL_FROM}"
+  smtp_auth_username: "${SMTP_USERNAME}"
+  smtp_auth_password_file: "${SMTP_PASSWORD_FILE}"
+  smtp_require_tls: ${SMTP_REQUIRE_TLS}
+
+templates: []
+
+route:
+  receiver: email
+  group_by:
+    - alertname
+    - job
+    - severity
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+  routes:
+    - receiver: email
+      matchers:
+        - severity=~"high|critical"
+      continue: false
+    - receiver: email
+      matchers:
+        - severity=~"warning|info"
+      active_time_intervals:
+        - business-hours
+      continue: false
+    - receiver: discard
+
+receivers:
+  - name: email
+    email_configs:
+      - to: "${ALERT_EMAIL_TO}"
+        send_resolved: true
+        headers:
+          subject: "[{{ .Status | toUpper }}] {{ .CommonLabels.severity }} {{ .CommonLabels.alertname }}"
+  - name: discard
+
+time_intervals:
+  - name: business-hours
+    time_intervals:
+      - weekdays:
+          - monday:friday
+        times:
+          - start_time: "09:00"
+            end_time: "18:00"

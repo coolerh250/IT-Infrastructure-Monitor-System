@@ -1,0 +1,29 @@
+groups:
+  - name: availability
+    rules:
+      - alert: TargetDown
+        expr: up == 0
+        for: 5m
+        labels:
+          severity: high
+        annotations:
+          summary: "Target is down"
+          description: "{{ $labels.job }} target {{ $labels.instance }} has been down for more than 5 minutes."
+
+      - alert: HttpProbeFailed
+        expr: probe_success == 0
+        for: 5m
+        labels:
+          severity: high
+        annotations:
+          summary: "HTTP probe failed"
+          description: "Blackbox probe for {{ $labels.instance }} has failed for more than 5 minutes."
+
+      - alert: PrometheusConfigReloadFailed
+        expr: prometheus_config_last_reload_successful == 0
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Prometheus configuration reload failed"
+          description: "Prometheus failed to reload its configuration."

@@ -1,0 +1,7 @@
+- targets:
+    - https://example-monitor-target-1.invalid/health
+    - https://example-monitor-target-2.invalid/health
+    - https://example-monitor-target-3.invalid/health
+  labels:
+    probe: http
+    site: example-site

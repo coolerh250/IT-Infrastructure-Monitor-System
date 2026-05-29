@@ -1,0 +1,38 @@
+groups:
+  - name: host-health
+    rules:
+      - alert: HostHighCpuUsage
+        expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 85
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage"
+          description: "{{ $labels.instance }} CPU usage is above 85% for 15 minutes."
+
+      - alert: HostHighMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 90
+        for: 10m
+        labels:
+          severity: high
+        annotations:
+          summary: "High memory usage"
+          description: "{{ $labels.instance }} memory usage is above 90% for 10 minutes."
+
+      - alert: HostLowDiskSpace
+        expr: (1 - (node_filesystem_avail_bytes{fstype!~"tmpfs|overlay|squashfs"} / node_filesystem_size_bytes{fstype!~"tmpfs|overlay|squashfs"})) * 100 > 85
+        for: 15m
+        labels:
+          severity: high
+        annotations:
+          summary: "Low disk space"
+          description: "{{ $labels.instance }} filesystem {{ $labels.mountpoint }} usage is above 85%."
+
+      - alert: HostClockSkew
+        expr: abs(node_timex_offset_seconds) > 0.05
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Host clock skew detected"
+          description: "{{ $labels.instance }} clock offset is above 50 ms."

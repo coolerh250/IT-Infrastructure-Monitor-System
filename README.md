@@ -1,21 +1,59 @@
 # IT Infrastructure Monitor System
 
-Reusable source-control repository for an automated IT infrastructure monitoring system.
+Docker Compose based monitoring stack for Ubuntu hosts. The stack includes:
 
-## Purpose
+- Prometheus
+- Grafana
+- PostgreSQL for Grafana metadata
+- Alertmanager with email notifications
+- Blackbox Exporter
+- Node Exporter
 
-This repository is intended to preserve reusable architecture, procedures, deployment templates, and sanitized configuration examples for building an automated monitoring mechanism based on components such as Grafana, Prometheus, Alertmanager, exporters, backup/restore scripts, and AI-friendly operational runbooks.
+This repository is intended to make the current monitoring environment repeatable on a new Ubuntu/Docker host without committing secrets or internal personal data.
 
-## Security rule
+## Quick Start
 
-Do **not** commit production secrets or personally identifiable/internal-only information.
+1. Install Docker Engine with the Compose plugin on Ubuntu.
+2. Copy `.env.example` to `.env`.
+3. Replace placeholder values in `.env`. Do not commit `.env`.
+4. Put SMTP and backup encryption secrets in local files outside git, for example under `./secrets/`.
+5. Validate configuration:
 
-Use placeholders and examples instead of real values, for example:
+   ```bash
+   ./scripts/validate.sh
+   ```
 
-- `10.0.0.0/24` or `192.0.2.0/24` instead of real internal networks
-- `monitoring.example.internal` instead of real hostnames/FQDNs
-- `admin@example.com` instead of real employee email addresses
-- `${GRAFANA_ADMIN_PASSWORD}` instead of actual passwords
-- `${SMTP_PASSWORD}` instead of actual SMTP credentials
+6. Deploy:
 
-See `docs/data-redaction-policy.md` before adding deployment outputs or configuration snapshots.
+   ```bash
+   ./scripts/deploy.sh
+   ```
+
+Grafana is exposed on `${GRAFANA_PORT:-3000}` and Prometheus is exposed on `${PROMETHEUS_PORT:-9090}`. Management access should be restricted to `${MANAGEMENT_CIDR:-10.0.1.0/24}` by host firewall rules; see [docs/security.md](docs/security.md).
+
+## Required Local Secret Files
+
+The stack reads secrets from files that are intentionally not tracked:
+
+- `GRAFANA_ADMIN_PASSWORD_FILE`
+- `POSTGRES_PASSWORD_FILE`
+- `SMTP_PASSWORD_FILE`
+- `BACKUP_PASSPHRASE_FILE`
+
+Each file should contain exactly one secret value. Example paths are documented in `.env.example`.
+
+## Operations
+
+- Deployment guide: [docs/deployment.md](docs/deployment.md)
+- Backup, restore, and routine operations: [docs/operations.md](docs/operations.md)
+- Security controls and secret handling: [docs/security.md](docs/security.md)
+
+## Validation
+
+Run the local validation helper before deployment or after edits:
+
+```bash
+./scripts/validate.sh
+```
+
+It performs shell syntax checks and, when Docker Compose is available, validates the Compose model.
